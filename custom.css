@@ -1,0 +1,24 @@
+#jogo{
+    width:603px;
+    height:600px;
+    border:solid 3px;
+    display: none;
+    text-align: center;
+}
+ 
+.linha{
+    height:200px;
+    border-bottom:solid 1px;
+}
+ 
+.celula{
+    
+    width:200px;
+    height:100%;
+    border-right:solid 1px;
+    float:left;
+}
+
+#imgVelha{
+    width: 50%;
+}

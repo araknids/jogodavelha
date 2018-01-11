@@ -1,0 +1,228 @@
+<html lang="pt-br">
+    <head>
+        <link rel="stylesheet" type="text/css" href="custom.css"/>   
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div id="menu" style="text-align:center;">
+            <h1 >Jogo da Velha!!!</h1>
+            <img id="imgVelha" src="velha.jpg"/>
+            <p>
+                <input name="qtdJogadores" class="qtdJogadores" type="radio" value="1" checked="true">1 Jogador</input>
+                <input name="qtdJogadores" class="qtdJogadores" type="radio" value="2">2 Jogadores</input>
+            </p>
+            <p>
+                <button type="button" id="btn-jogar" onclick="jogar()">Começar a partida!</button>
+            </p>
+            
+        </div>
+        <div id="jogo" >
+            <div class="linha">
+                <div class="celula" id="celula1" onclick="marcarCelula(1);"></div>
+                <div class="celula" id="celula2" onclick="marcarCelula(2);"></div>
+                <div class="celula" id="celula3" onclick="marcarCelula(3);"></div>
+            </div>
+            <div class="linha">
+                <div class="celula" id="celula4" onclick="marcarCelula(4);"></div>
+                <div class="celula" id="celula5" onclick="marcarCelula(5);"></div>
+                <div class="celula" id="celula6" onclick="marcarCelula(6);"></div>
+            </div>
+            <div class="linha">
+                <div class="celula" id="celula7" onclick="marcarCelula(7);"></div>
+                <div class="celula" id="celula8" onclick="marcarCelula(8);"></div>
+                <div class="celula" id="celula9" onclick="marcarCelula(9);"></div>
+            </div>
+            <button title="Recomeçar" onclick="recomecar();">Clique aqui para recomeçar</button>
+        </div>
+        <div id="resultado"></div>
+    </body>
+</html>
+<script>
+    Array.prototype.notContains = function(celulas) {
+        var naoContem = true;
+        for (const i of this) {
+            for (const celula of celulas) {
+                if (String(i).indexOf(celula) > -1){
+                    naoContem = false;
+                }
+            }
+        }
+        return naoContem;
+    }
+
+    Array.prototype.contains = function(elem){
+    var indices = [];
+    for (const i of this) {
+        if (String(i).indexOf(elem) !== -1){
+            indices.push(i); 
+        }
+    }
+        return indices;
+    }
+
+    var vez = 1;
+    var vencedor = "";
+    var pontos = 0;
+    var qtdJogadores = 1;
+    var jogadasVencedoras = ["1,2,3","4,5,6","7,8,9","1,4,7","2,5,8","3,6,9","1,5,9", "3,5,7"];
+    var celulasInimigas = [];
+
+    function jogar(){
+        document.querySelector("#jogo").style.display = 'block';
+        document.querySelector("#menu").style.display = 'none';
+        var radios = document.querySelectorAll(".qtdJogadores");
+        for (const radio of radios) {
+           if(radio.checked){
+                qtdJogadores = radio.value;
+           }
+        }
+    }
+
+    function marcarCelula(numeroCelula){
+        var celula = document.getElementById("celula"+ numeroCelula);
+        var imgFundo = celula.style.backgroundImage;
+        if(imgFundo == ""){          
+            var img = 'url(' + vez.toString() + '.jpg)';
+            celula.style.background = img;
+            if(qtdJogadores == 1){
+                marcarCelulaIA();
+            }else{
+                vez = (vez == 1? 2:1); 
+            }
+            verificarFimDeJogo();
+        }
+    };
+
+    function verificarFimDeJogo(){
+        if( celulasIguais(1, 2, 3) || celulasIguais(4, 5, 6) || celulasIguais(7, 8, 9) ||
+            celulasIguais(1, 4, 7) || celulasIguais(2, 5, 8) || celulasIguais(3, 6, 9) ||
+            celulasIguais(1, 5, 9) || celulasIguais(3, 5, 7)){
+            document.querySelector("#resultado").innerHTML = "<h1>O jogador " + vencedor + " venceu! </h1>";
+            //document.querySelector('.celula').off("click");
+        }
+    }
+
+    function celulasIguais(a, b, c){
+        var celulaA = document.querySelector("#celula"+a);
+        var celulaB = document.querySelector("#celula"+b);
+        var celulaC = document.querySelector("#celula"+c);
+        var fundoA = celulaA.style.backgroundImage;
+        var fundoB = celulaB.style.backgroundImage;
+        var fundoC = celulaC.style.backgroundImage;
+        if( (fundoA == fundoB) && (fundoB == fundoC) && (fundoA != "") ){
+            if(fundoA.indexOf("1.jpg") >= 0){
+                vencedor = "1";
+            }else{
+                vencedor = "2";
+            }
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function recomecar(){
+        var celulas = document.querySelectorAll('.celula');
+        for (const celula of celulas) {
+            celula.style.background = '';
+        }
+    }
+
+    function aproximarEstrategia(possibilidades, celulasInimiga){
+        var maiorValor = 0;
+        var repetidas = [];
+        var melhoresJogadas = [];
+        for (const possibilidade of possibilidades) {
+            var contadorRepeticoes = 0;
+            var celulas = String(possibilidade).split(",");
+            for (const celula of celulas) {
+                for (const celulaInimiga of celulasInimiga) {
+                    if(celula==celulaInimiga){
+                        contadorRepeticoes++;
+                    }
+                }
+
+            }
+            repetidas.push(contadorRepeticoes);
+        }
+        for(i=0; i < repetidas.length; i++){
+            if(repetidas[i] > maiorValor){
+                maiorValor = repetidas[i];
+            }
+        }
+        var indiceProvavelJogada = repetidas.indexOf(maiorValor);
+        var celulas = String(possibilidades[indiceProvavelJogada]).split(",");//celulas a serem jogadas
+        //iteração para verificar qual celula é diferente do inimigo
+       // for (const celula of celulas) {
+           // for (const celulaInimiga of celulasInimiga) {
+                console.log(arr_diff(celulasInimiga, celulas)); 
+                //if(celulasInimiga.notContains(celulas)){
+        //       }
+          //  }
+           
+    }
+    function arr_diff (celulasInimiga, celulas) {
+
+        var a = [], diferentes = [];
+
+        for (var i = 0; i < celulasInimiga.length; i++) {
+            a[true[i]] = celulasInimiga[i];
+        }
+
+        for (var i = 0; i < celulas.length; i++) {
+            if (a[true[i]]) {
+                delete a[celulas[i]];
+            } else {
+                a[celulas[i]] = true;
+            }
+        }
+        return a;
+    }
+    
+
+    function obterNumeroDiferente(celulasInimiga, celulas){
+        var naoContidas = [];
+        for (const i of celulasInimiga) {
+            var contem = false;
+            for (const celula of celulas) {
+                if (String(i).indexOf(celula) == -1 && contem == false){
+                    naoContidas.push(celula);
+                    contem == true;
+                }
+            }
+        }
+        return naoContidas;
+    }
+
+    function descobrirEstrategiaInimiga(jogadasVencedoras, celulasInimigas){
+        var indices = [];
+        for (const jogadaVencedora of jogadasVencedoras) {
+            var achou = false;
+            for(i=0; i < celulasInimigas.length; i++){
+                if (String(jogadaVencedora).indexOf(celulasInimigas[i]) !== -1 && achou == false){
+                    indices.push(jogadaVencedora); 
+                    achou = true;
+                }
+            }
+        }
+        return indices;
+    }
+
+    function marcarCelulaIA(){
+        var todasCelulas = document.querySelectorAll("[style]");
+        var celulasInimigas = [];
+        var estrategiaInimiga= [];
+        for (const celula of todasCelulas) {
+            if(celula.style.background.indexOf("1.jpg") > -1){
+                celulasInimigas.push(celula.getAttribute("id").substring(celula.getAttribute("id").length-1, celula.getAttribute("id").length));
+            }
+        }
+        estrategiaInimiga = descobrirEstrategiaInimiga(jogadasVencedoras, celulasInimigas);  
+        var jogada = aproximarEstrategia(estrategiaInimiga, celulasInimigas);
+        //console.log(estrategiaInimiga);
+       // var imgFundo = celula.style.backgroundImage;
+       // var img = "url(" + vez.toString() + ".jpg)";
+       // celula.style.background = img;
+    }
+
+</script>
