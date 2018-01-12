@@ -38,28 +38,6 @@
     </body>
 </html>
 <script>
-    Array.prototype.notContains = function(celulas) {
-        var naoContem = true;
-        for (const i of this) {
-            for (const celula of celulas) {
-                if (String(i).indexOf(celula) > -1){
-                    naoContem = false;
-                }
-            }
-        }
-        return naoContem;
-    }
-
-    Array.prototype.contains = function(elem){
-    var indices = [];
-    for (const i of this) {
-        if (String(i).indexOf(elem) !== -1){
-            indices.push(i); 
-        }
-    }
-        return indices;
-    }
-
     var vez = 1;
     var vencedor = "";
     var pontos = 0;
@@ -153,45 +131,26 @@
         var indiceProvavelJogada = repetidas.indexOf(maiorValor);
         var celulas = String(possibilidades[indiceProvavelJogada]).split(",");//celulas a serem jogadas
         //iteração para verificar qual celula é diferente do inimigo
-       // for (const celula of celulas) {
-           // for (const celulaInimiga of celulasInimiga) {
-                console.log(arr_diff(celulasInimiga, celulas)); 
-                //if(celulasInimiga.notContains(celulas)){
-        //       }
-          //  }
-           
-    }
-    function arr_diff (celulasInimiga, celulas) {
-
-        var a = [], diferentes = [];
-
-        for (var i = 0; i < celulasInimiga.length; i++) {
-            a[true[i]] = celulasInimiga[i];
-        }
-
-        for (var i = 0; i < celulas.length; i++) {
-            if (a[true[i]]) {
-                delete a[celulas[i]];
-            } else {
-                a[celulas[i]] = true;
-            }
-        }
-        return a;
-    }
-    
-
-    function obterNumeroDiferente(celulasInimiga, celulas){
-        var naoContidas = [];
-        for (const i of celulasInimiga) {
-            var contem = false;
-            for (const celula of celulas) {
-                if (String(i).indexOf(celula) == -1 && contem == false){
-                    naoContidas.push(celula);
-                    contem == true;
+        celulas : for (const celula of celulas) {
+            if(celulasInimiga.length == 1){
+                if(celula != celulasInimiga){
+                    melhoresJogadas.push(celula); 
+                }
+            }else{
+                var achou = celulasInimiga.indexOf(celula);
+                if(achou > -1){
+                    continue celulas;
+                }else{
+                    melhoresJogadas.push(celula); 
                 }
             }
         }
-        return naoContidas;
+        if(melhoresJogadas.length > 1){
+            var melhorJogada = melhoresJogadas[Math.round(Math.random() * melhoresJogadas.length)];
+            return melhorJogada;
+        }else{
+            return melhoresJogadas[0];
+        }
     }
 
     function descobrirEstrategiaInimiga(jogadasVencedoras, celulasInimigas){
@@ -219,10 +178,11 @@
         }
         estrategiaInimiga = descobrirEstrategiaInimiga(jogadasVencedoras, celulasInimigas);  
         var jogada = aproximarEstrategia(estrategiaInimiga, celulasInimigas);
-        //console.log(estrategiaInimiga);
-       // var imgFundo = celula.style.backgroundImage;
-       // var img = "url(" + vez.toString() + ".jpg)";
-       // celula.style.background = img;
+        console.log(jogada);
+        var celulaParaMarcar = document.getElementById("celula"+ jogada);
+        celulaParaMarcar.style.backgroundImage = 'url(2.jpg)';
+        //TODO fazer nao pegar as minhas que eu ja selecionei tambem
+
     }
 
 </script>
