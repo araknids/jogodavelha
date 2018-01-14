@@ -44,6 +44,7 @@
     var qtdJogadores = 1;
     var jogadasVencedoras = ["1,2,3","4,5,6","7,8,9","1,4,7","2,5,8","3,6,9","1,5,9", "3,5,7"];
     var celulasInimigas = [];
+    var celulasPC = [];
 
     function jogar(){
         document.querySelector("#jogo").style.display = 'block';
@@ -137,13 +138,11 @@
                     melhoresJogadas.push(celula); 
                 }
             }else{
-                var achou = celulasInimiga.indexOf(celula);
-                if(achou > -1){
-                    continue celulas;
-                }else{
-                    melhoresJogadas.push(celula); 
+                if(celulasInimiga.indexOf(celula) == -1 && celulasPC.indexOf(celula) == -1){
+                    melhoresJogadas.push(celula);
                 }
             }
+            
         }
         if(melhoresJogadas.length > 1){
             var melhorJogada = melhoresJogadas[Math.round(Math.random() * melhoresJogadas.length)];
@@ -154,17 +153,28 @@
     }
 
     function descobrirEstrategiaInimiga(jogadasVencedoras, celulasInimigas){
-        var indices = [];
+        var jogadasProvaveis = [];
         for (const jogadaVencedora of jogadasVencedoras) {
             var achou = false;
             for(i=0; i < celulasInimigas.length; i++){
-                if (String(jogadaVencedora).indexOf(celulasInimigas[i]) !== -1 && achou == false){
-                    indices.push(jogadaVencedora); 
+                if (String(jogadaVencedora).indexOf(celulasInimigas[i]) !== -1 && achou == false && (String(jogadaVencedora).indexOf(celulasPC[i]) !== -1 || String(jogadaVencedora).indexOf(celulasPC[i]))){
+                    jogadasProvaveis.push(jogadaVencedora); 
                     achou = true;
                 }
             }
+            //iteração para eliminar as linhas que ja foram preenchidas
+            var celulas = String(jogadaVencedora).split(",");
+            var vazio = 0;
+            for (const celula of celulas) {
+                if(document.getElementById("celula"+ celula).style.backgroundImage != ""){
+                    vazio++;
+                }
+            }
+            if(vazio == 3){ 
+                jogadasProvaveis.splice(jogadasProvaveis.indexOf(jogadaVencedora), 1); 
+            }
         }
-        return indices;
+        return jogadasProvaveis;
     }
 
     function marcarCelulaIA(){
@@ -181,8 +191,8 @@
         console.log(jogada);
         var celulaParaMarcar = document.getElementById("celula"+ jogada);
         celulaParaMarcar.style.backgroundImage = 'url(2.jpg)';
-        //TODO fazer nao pegar as minhas que eu ja selecionei tambem
-
+        celulasPC.push(jogada);
+        
     }
 
 </script>
