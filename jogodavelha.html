@@ -63,6 +63,8 @@
         if(imgFundo == ""){          
             var img = 'url(' + vez.toString() + '.jpg)';
             celula.style.background = img;
+            celula.classList.add("marcada");
+            celula.style.pointerEvents = 'none';
             if(qtdJogadores == 1){
                 marcarCelulaIA();
             }else{
@@ -76,8 +78,20 @@
         if( celulasIguais(1, 2, 3) || celulasIguais(4, 5, 6) || celulasIguais(7, 8, 9) ||
             celulasIguais(1, 4, 7) || celulasIguais(2, 5, 8) || celulasIguais(3, 6, 9) ||
             celulasIguais(1, 5, 9) || celulasIguais(3, 5, 7)){
-            document.querySelector("#resultado").innerHTML = "<h1>O jogador " + vencedor + " venceu! </h1>";
-            //document.querySelector('.celula').off("click");
+            if(qtdJogadores == 2){
+                document.querySelector("#resultado").innerHTML = "<h1>O jogador " + vencedor + " venceu! </h1>";
+            }else{
+                if(vencedor == 1){
+                    document.querySelector("#resultado").innerHTML = "<h1>O jogador " + vencedor + " venceu! </h1>";
+                }else{
+                    document.querySelector("#resultado").innerHTML = "<h1>O computador venceu! </h1>";
+                }
+            }
+        }else{
+            var todasCelulas = document.querySelectorAll(".marcada");
+            if(todasCelulas.length == 9){
+                document.querySelector("#resultado").innerHTML = "<h1>Empate!!! </h1>";
+            }
         }
     }
 
@@ -104,6 +118,18 @@
         var celulas = document.querySelectorAll('.celula');
         for (const celula of celulas) {
             celula.style.background = '';
+        }
+        vez = 1;
+        vencedor = "";
+        pontos = 0;
+        qtdJogadores = 1;
+        celulasInimigas = [];
+        celulasPC = [];
+        document.querySelector("#resultado").innerHTML = "";
+        var todasCelulasMarcadas = document.querySelectorAll(".marcada");
+        for (const celula of todasCelulasMarcadas) {
+            celula.classList.remove("marcada");
+            celula.style.pointerEvents = 'auto'; 
         }
     }
 
@@ -145,6 +171,7 @@
             
         }
         if(melhoresJogadas.length > 1){
+            console.log("conta " + Math.round(Math.random() * melhoresJogadas.length));
             var melhorJogada = melhoresJogadas[Math.round(Math.random() * melhoresJogadas.length)];
             return melhorJogada;
         }else{
@@ -157,7 +184,9 @@
         for (const jogadaVencedora of jogadasVencedoras) {
             var achou = false;
             for(i=0; i < celulasInimigas.length; i++){
-                if (String(jogadaVencedora).indexOf(celulasInimigas[i]) !== -1 && achou == false && (String(jogadaVencedora).indexOf(celulasPC[i]) !== -1 || String(jogadaVencedora).indexOf(celulasPC[i]))){
+                if (String(jogadaVencedora).indexOf(celulasInimigas[i]) !== -1 && achou == false 
+                && (String(jogadaVencedora).indexOf(celulasPC[i]) !== -1 
+                || String(jogadaVencedora).indexOf(celulasPC[i]))){
                     jogadasProvaveis.push(jogadaVencedora); 
                     achou = true;
                 }
@@ -178,7 +207,7 @@
     }
 
     function marcarCelulaIA(){
-        var todasCelulas = document.querySelectorAll("[style]");
+        var todasCelulas = document.querySelectorAll(".celula");
         var celulasInimigas = [];
         var estrategiaInimiga= [];
         for (const celula of todasCelulas) {
@@ -186,11 +215,16 @@
                 celulasInimigas.push(celula.getAttribute("id").substring(celula.getAttribute("id").length-1, celula.getAttribute("id").length));
             }
         }
+        if((celulasPC.length + celulasInimigas.length) == 9){
+            return;
+        }
         estrategiaInimiga = descobrirEstrategiaInimiga(jogadasVencedoras, celulasInimigas);  
         var jogada = aproximarEstrategia(estrategiaInimiga, celulasInimigas);
         console.log(jogada);
         var celulaParaMarcar = document.getElementById("celula"+ jogada);
         celulaParaMarcar.style.backgroundImage = 'url(2.jpg)';
+        celulaParaMarcar.classList.add("marcada");
+        celulaParaMarcar.style.pointerEvents = 'none';
         celulasPC.push(jogada);
         
     }
